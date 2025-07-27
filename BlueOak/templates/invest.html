@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Invest - WealthMax Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Choose Investment Plan
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="investmentForm">
+                        <div class="mb-4">
+                            <label for="plan_id" class="form-label">Select Investment Plan *</label>
+                            <select class="form-control" id="plan_id" name="plan_id" required onchange="updatePlanDetails()">
+                                <option value="">Choose a plan...</option>
+                                {% for plan in plans %}
+                                <option value="{{ plan.id }}" 
+                                        data-min="{{ plan.min_amount }}" 
+                                        data-max="{{ plan.max_amount }}" 
+                                        data-return="{{ plan.return_percentage }}"
+                                        data-duration="{{ plan.duration_days }}">
+                                    {{ plan.name }} - {{ plan.return_percentage }}% return in {{ plan.duration_days }} days
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="amount" class="form-label">Investment Amount (₹) *</label>
+                            <input type="number" class="form-control" id="amount" name="amount" min="100" step="100" required oninput="calculateReturn()">
+                            <div class="form-text">
+                                <span id="amountRange">Enter amount between ₹1,000 - ₹5,000</span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h6 class="text-muted">Investment Amount</h6>
+                                        <h4 class="text-primary" id="displayAmount">₹0</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <h6>Expected Return</h6>
+                                        <h4 id="displayReturn">₹0</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Important:</strong> Your investment will be locked for the duration of the plan. 
+                            Returns will be automatically credited to your account upon completion.
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-check me-2"></i>Confirm Investment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Available Plans -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>Available Plans
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for plan in plans %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">{{ plan.name }}</h6>
+                            <span class="badge bg-success">{{ plan.return_percentage }}%</span>
+                        </div>
+                        <p class="text-muted small mb-2">{{ plan.description }}</p>
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <small class="text-muted">Min: ₹{{ "{:,.0f}".format(plan.min_amount) }}</small>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Max: ₹{{ "{:,.0f}".format(plan.max_amount) }}</small>
+                            </div>
+                        </div>
+                        <div class="text-center mt-2">
+                            <small class="text-muted">{{ plan.duration_days }} days duration</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Account Balance -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-wallet me-2"></i>Account Balance
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="h3 text-primary mb-2">₹{{ "{:,.2f}".format(current_user.balance) }}</div>
+                    <p class="text-muted mb-3">Available for investment</p>
+                    {% if current_user.balance < 1000 %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Low balance. Please deposit funds to invest.
+                    </div>
+                    <a href="{{ url_for('deposit') }}" class="btn btn-success w-100">
+                        <i class="fas fa-plus me-2"></i>Deposit Funds
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updatePlanDetails() {
+    const select = document.getElementById('plan_id');
+    const option = select.options[select.selectedIndex];
+    const amountRange = document.getElementById('amountRange');
+    
+    if (option.value) {
+        const min = option.getAttribute('data-min');
+        const max = option.getAttribute('data-max');
+        amountRange.textContent = `Enter amount between ₹${parseInt(min).toLocaleString()} - ₹${parseInt(max).toLocaleString()}`;
+        
+        // Update amount input min/max
+        document.getElementById('amount').min = min;
+        document.getElementById('amount').max = max;
+    } else {
+        amountRange.textContent = 'Select a plan first';
+    }
+    
+    calculateReturn();
+}
+
+function calculateReturn() {
+    const select = document.getElementById('plan_id');
+    const amount = parseFloat(document.getElementById('amount').value) || 0;
+    const option = select.options[select.selectedIndex];
+    
+    if (option.value && amount > 0) {
+        const returnPercentage = parseFloat(option.getAttribute('data-return'));
+        const expectedReturn = amount * (1 + returnPercentage / 100);
+        
+        document.getElementById('displayAmount').textContent = `₹${amount.toLocaleString()}`;
+        document.getElementById('displayReturn').textContent = `₹${expectedReturn.toLocaleString()}`;
+    } else {
+        document.getElementById('displayAmount').textContent = '₹0';
+        document.getElementById('displayReturn').textContent = '₹0';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updatePlanDetails();
+});
+</script>
+{% endblock %} 

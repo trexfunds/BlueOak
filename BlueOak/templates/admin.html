@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - WealthMax Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Admin Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h2 class="mb-2">
+                        <i class="fas fa-crown me-2"></i>Admin Panel
+                    </h2>
+                    <p class="mb-0">Manage users, transactions, and system operations</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <div class="h3 mb-2">{{ users|length }}</div>
+                    <div>Total Users</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <div class="h3 mb-2">{{ transactions|selectattr('status', 'equalto', 'pending')|list|length }}</div>
+                    <div>Pending Transactions</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <div class="h3 mb-2">{{ investments|selectattr('status', 'equalto', 'active')|list|length }}</div>
+                    <div>Active Investments</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card bg-secondary text-white">
+                <div class="card-body text-center">
+                    <div class="h3 mb-2">₹{{ "{:,.0f}".format(users|sum(attribute='total_invested')) }}</div>
+                    <div>Total Invested</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tools me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="#transactions" class="btn btn-warning w-100">
+                                <i class="fas fa-clock me-2"></i>Review Transactions
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="#users" class="btn btn-info w-100">
+                                <i class="fas fa-users me-2"></i>Manage Users
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="#investments" class="btn btn-success w-100">
+                                <i class="fas fa-chart-line me-2"></i>View Investments
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('process_returns') }}" class="btn btn-primary w-100" onclick="return confirm('Process all completed investment returns?')">
+                                <i class="fas fa-money-bill-wave me-2"></i>Process Returns
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Transactions -->
+    <div class="row mb-4" id="transactions">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-clock me-2"></i>Pending Transactions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% set pending_transactions = transactions|selectattr('status', 'equalto', 'pending')|list %}
+                    {% if pending_transactions %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>UPI ID</th>
+                                    <th>Reference ID</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in pending_transactions %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ transaction.user.username }}</strong>
+                                        <br><small class="text-muted">{{ transaction.user.email }}</small>
+                                    </td>
+                                    <td>
+                                        {% if transaction.transaction_type == 'deposit' %}
+                                            <span class="badge bg-success">Deposit</span>
+                                        {% elif transaction.transaction_type == 'withdrawal' %}
+                                            <span class="badge bg-warning">Withdrawal</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>₹{{ "{:,.2f}".format(transaction.amount) }}</td>
+                                    <td>{{ transaction.upi_id }}</td>
+                                    <td><small>{{ transaction.reference_id }}</small></td>
+                                    <td>{{ transaction.created_at.strftime('%d %b %Y %H:%M') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('approve_transaction', transaction_id=transaction.id) }}" 
+                                           class="btn btn-success btn-sm"
+                                           onclick="return confirm('Approve this transaction?')">
+                                            <i class="fas fa-check me-1"></i>Approve
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h5>No Pending Transactions</h5>
+                        <p class="text-muted">All transactions have been processed</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Management -->
+    <div class="row mb-4" id="users">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-users me-2"></i>User Management
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Balance</th>
+                                    <th>Total Invested</th>
+                                    <th>Total Earned</th>
+                                    <th>Joined</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <div>
+                                                <strong>{{ user.name }}</strong>
+                                                {% if user.is_admin %}
+                                                    <br><span class="badge bg-danger">Admin</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ user.phone }}</td>
+                                    <td>₹{{ "{:,.2f}".format(user.balance) }}</td>
+                                    <td>₹{{ "{:,.2f}".format(user.total_invested) }}</td>
+                                    <td>₹{{ "{:,.2f}".format(user.total_earned) }}</td>
+                                    <td>{{ user.created_at.strftime('%d %b %Y') }}</td>
+                                    <td>
+                                        {% if user.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Investment Overview -->
+    <div class="row mb-4" id="investments">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Investment Overview
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Plan</th>
+                                    <th>Amount</th>
+                                    <th>Expected Return</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for investment in investments %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ investment.user.name }}</strong>
+                                        <br><small class="text-muted">{{ investment.user.phone }}</small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ investment.plan.name }}</strong>
+                                        <br><small class="text-muted">{{ investment.plan.return_percentage }}% return</small>
+                                    </td>
+                                    <td>₹{{ "{:,.2f}".format(investment.amount) }}</td>
+                                    <td>₹{{ "{:,.2f}".format(investment.expected_return) }}</td>
+                                    <td>{{ investment.start_date.strftime('%d %b %Y') }}</td>
+                                    <td>{{ investment.end_date.strftime('%d %b %Y') }}</td>
+                                    <td>
+                                        {% if investment.status == 'active' %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% elif investment.status == 'completed' %}
+                                            <span class="badge bg-info">Completed</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Cancelled</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Statistics -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>System Statistics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <div class="h4 text-primary mb-1">₹{{ "{:,.0f}".format(users|sum(attribute='balance')) }}</div>
+                            <small class="text-muted">Total User Balance</small>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="h4 text-success mb-1">₹{{ "{:,.0f}".format(users|sum(attribute='total_invested')) }}</div>
+                            <small class="text-muted">Total Invested</small>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="h4 text-info mb-1">₹{{ "{:,.0f}".format(users|sum(attribute='total_earned')) }}</div>
+                            <small class="text-muted">Total Earned</small>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="h4 text-warning mb-1">{{ transactions|length }}</div>
+                            <small class="text-muted">Total Transactions</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

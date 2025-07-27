@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}BlueOak Investment Firm - Professional Investment Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 hero-content">
+                <h1 class="display-4 fw-bold mb-4">
+                    Strategic Wealth Management with BlueOak Investment Firm
+                </h1>
+                <p class="lead mb-4">
+                    Experience institutional-grade investment strategies designed for optimal returns. 
+                    Our sophisticated portfolio management approach delivers consistent performance through 
+                    diversified market opportunities and advanced risk management protocols.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
+                        <i class="fas fa-rocket me-2"></i>Start Investing
+                    </a>
+                    <a href="#plans" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-chart-bar me-2"></i>View Plans
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="position-relative">
+                    <div class="stats-card d-inline-block">
+                        <div class="stats-number">₹50M+</div>
+                        <div class="stats-label">Total Investments</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 mb-4">
+                <div class="stats-card">
+                    <div class="stats-number">₹150M+</div>
+                    <div class="stats-label">Assets Under Management</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stats-card">
+                    <div class="stats-number">12,500+</div>
+                    <div class="stats-label">Portfolio Clients</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stats-card">
+                    <div class="stats-number">99.2%</div>
+                    <div class="stats-label">Performance Success Rate</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="stats-card">
+                    <div class="stats-number">₹8.5M</div>
+                    <div class="stats-label">Monthly Returns Distributed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Investment Plans Section -->
+<section id="plans" class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">Strategic Investment Portfolios</h2>
+            <p class="lead text-muted">Access institutional-grade investment strategies with proven performance track records</p>
+        </div>
+        
+        <div class="row">
+            {% for plan in plans %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card investment-plan-card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">{{ plan.name }}</h5>
+                            <span class="plan-badge">{{ plan.return_percentage }}% Return</span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="stat-value">₹{{ "{:,.0f}".format(plan.min_amount) }}</div>
+                                    <div class="stat-label">Min Investment</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-value">{{ plan.duration_days }}</div>
+                                    <div class="stat-label">Days</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p class="card-text text-muted mb-4">{{ plan.description }}</p>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Max Investment: ₹{{ "{:,.0f}".format(plan.max_amount) }}
+                            </small>
+                        </div>
+                        
+                        {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('invest') }}" class="btn btn-primary w-100">
+                            <i class="fas fa-arrow-right me-2"></i>Invest Now
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('register') }}" class="btn btn-primary w-100">
+                            <i class="fas fa-user-plus me-2"></i>Register to Invest
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">Our Investment Strategy & Methodology</h2>
+            <p class="lead text-muted">Discover how our sophisticated approach generates consistent returns through diversified market opportunities</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="bg-primary bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-shield-alt fa-2x"></i>
+                    </div>
+                    <h5>Institutional Security</h5>
+                    <p class="text-muted">Bank-grade encryption and regulatory compliance ensure your capital is protected with the highest security standards</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="bg-success bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-chart-line fa-2x"></i>
+                    </div>
+                    <h5>Strategic Returns</h5>
+                    <p class="text-muted">Our diversified portfolio strategy leverages market inefficiencies and arbitrage opportunities to generate consistent returns</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="bg-warning bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                    <h5>Performance Incentives</h5>
+                    <p class="text-muted">Earn commission rewards for expanding our investor network while helping others access professional investment opportunities</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="text-center">
+                    <div class="bg-info bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-headset fa-2x"></i>
+                    </div>
+                    <h5>Professional Support</h5>
+                    <p class="text-muted">Dedicated relationship managers and investment advisors provide personalized guidance for optimal portfolio performance</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="display-5 fw-bold mb-3">Ready to Access Institutional-Grade Investment Opportunities?</h2>
+        <p class="lead mb-4">Join our exclusive network of sophisticated investors and experience professional wealth management</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">
+                <i class="fas fa-rocket me-2"></i>Get Started Now
+            </a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-sign-in-alt me-2"></i>Login
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Investment Strategy Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">How We Generate Returns</h2>
+            <p class="lead text-muted">Our sophisticated investment methodology explained</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-chart-line fa-2x"></i>
+                            </div>
+                            <h4 class="mb-0">Market Arbitrage Strategy</h4>
+                        </div>
+                        <p class="text-muted">We leverage price differentials across multiple financial markets, including cryptocurrency exchanges, forex markets, and commodity futures. Our proprietary algorithms identify arbitrage opportunities in real-time, executing trades across multiple venues to capture profit margins while maintaining strict risk management protocols.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-success bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-shield-alt fa-2x"></i>
+                            </div>
+                            <h4 class="mb-0">Risk Management Framework</h4>
+                        </div>
+                        <p class="text-muted">Our comprehensive risk management system includes position sizing, stop-loss mechanisms, and portfolio diversification. We maintain strict capital allocation limits and employ advanced hedging strategies to protect investor capital while maximizing return potential.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-warning bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-cogs fa-2x"></i>
+                            </div>
+                            <h4 class="mb-0">Algorithmic Trading Systems</h4>
+                        </div>
+                        <p class="text-muted">Our proprietary trading algorithms operate 24/7, continuously monitoring market conditions and executing trades based on sophisticated mathematical models. These systems identify patterns and opportunities that human traders might miss, ensuring optimal execution timing.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card h-100">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-info bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                                <i class="fas fa-network-wired fa-2x"></i>
+                            </div>
+                            <h4 class="mb-0">Multi-Market Diversification</h4>
+                        </div>
+                        <p class="text-muted">We diversify across multiple asset classes and markets to reduce correlation risk. Our portfolio includes cryptocurrency arbitrage, forex trading, commodity futures, and emerging market opportunities, ensuring consistent returns regardless of individual market conditions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">Client Success Stories</h2>
+            <p class="lead text-muted">Hear from our portfolio clients about their investment experience</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Rahul Sharma</h6>
+                                <small class="text-muted">Mumbai, India</small>
+                            </div>
+                        </div>
+                        <p class="card-text">"Exceptional portfolio performance! My ₹10,000 investment generated ₹15,000 through BlueOak's sophisticated arbitrage strategies. Professional execution and transparent reporting."</p>
+                        <div class="text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-success bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Priya Patel</h6>
+                                <small class="text-muted">Delhi, India</small>
+                            </div>
+                        </div>
+                        <p class="card-text">"The performance incentive program is excellent! I've earned over ₹5,000 through network expansion while helping others access professional investment opportunities."</p>
+                        <div class="text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-warning bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">Amit Kumar</h6>
+                                <small class="text-muted">Bangalore, India</small>
+                            </div>
+                        </div>
+                        <p class="card-text">"Institutional-grade platform with exceptional relationship management. My portfolio has demonstrated consistent growth through their strategic approach. Outstanding service quality."</p>
+                        <div class="text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

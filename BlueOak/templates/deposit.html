@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Deposit Funds - WealthMax Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-plus me-2"></i>Deposit Funds
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-4">
+                            <label for="amount" class="form-label">Deposit Amount (₹) *</label>
+                            <input type="number" class="form-control" id="amount" name="amount" min="100" step="100" required>
+                            <div class="form-text">Minimum deposit amount is ₹100</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="upi_id" class="form-label">Your UPI ID *</label>
+                            <input type="text" class="form-control" id="upi_id" name="upi_id" placeholder="yourname@upi" required>
+                            <div class="form-text">Enter your UPI ID for payment processing</div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>How it works:</h6>
+                            <ol class="mb-0">
+                                <li>Enter the amount you want to deposit</li>
+                                <li>Provide your UPI ID</li>
+                                <li>Our team will contact you within 24 hours</li>
+                                <li>Complete the UPI payment</li>
+                                <li>Funds will be credited to your account</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Important:</strong> Please ensure you have sufficient balance in your UPI account before making the deposit request.
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Deposit Request
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Deposit Instructions -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-question-circle me-2"></i>Deposit Instructions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Supported Payment Methods:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fab fa-google-pay text-success me-2"></i>Google Pay</li>
+                                <li><i class="fab fa-amazon-pay text-warning me-2"></i>Amazon Pay</li>
+                                <li><i class="fas fa-mobile-alt text-primary me-2"></i>PhonePe</li>
+                                <li><i class="fas fa-university text-info me-2"></i>Paytm</li>
+                                <li><i class="fas fa-credit-card text-secondary me-2"></i>BHIM UPI</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Processing Time:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-clock text-primary me-2"></i>Within 24 hours</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Instant verification</li>
+                                <li><i class="fas fa-shield-alt text-info me-2"></i>Secure processing</li>
+                                <li><i class="fas fa-bell text-warning me-2"></i>Email notifications</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Deposits -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>Recent Deposit Requests
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Amount</th>
+                                    <th>UPI ID</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in current_user.transactions if transaction.transaction_type == 'deposit' %}
+                                <tr>
+                                    <td>₹{{ "{:,.2f}".format(transaction.amount) }}</td>
+                                    <td>{{ transaction.upi_id }}</td>
+                                    <td>
+                                        {% if transaction.status == 'completed' %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% elif transaction.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Failed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ transaction.created_at.strftime('%d %b %Y') }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">No deposit requests yet</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

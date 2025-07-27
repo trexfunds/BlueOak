@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Withdraw Funds - WealthMax Pro{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-minus me-2"></i>Withdraw Funds
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-4">
+                            <label for="amount" class="form-label">Withdrawal Amount (₹) *</label>
+                            <input type="number" class="form-control" id="amount" name="amount" min="100" step="100" max="{{ current_user.balance }}" required>
+                            <div class="form-text">Available balance: ₹{{ "{:,.2f}".format(current_user.balance) }}</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="upi_id" class="form-label">Your UPI ID *</label>
+                            <input type="text" class="form-control" id="upi_id" name="upi_id" placeholder="yourname@upi" required>
+                            <div class="form-text">Enter your UPI ID to receive the withdrawal</div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>Withdrawal Process:</h6>
+                            <ol class="mb-0">
+                                <li>Enter the amount you want to withdraw</li>
+                                <li>Provide your UPI ID</li>
+                                <li>Our team will process your request within 24 hours</li>
+                                <li>Funds will be transferred to your UPI account</li>
+                                <li>You'll receive a confirmation email</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Important:</strong> Minimum withdrawal amount is ₹100. Processing time is 24-48 hours.
+                        </div>
+                        
+                        <button type="submit" class="btn btn-warning btn-lg w-100">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Withdrawal Request
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Account Balance -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-wallet me-2"></i>Account Overview
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="h4 text-primary mb-1">₹{{ "{:,.2f}".format(current_user.balance) }}</div>
+                            <small class="text-muted">Available Balance</small>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="h4 text-success mb-1">₹{{ "{:,.2f}".format(current_user.total_earned) }}</div>
+                            <small class="text-muted">Total Earned</small>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="h4 text-info mb-1">₹{{ "{:,.2f}".format(current_user.total_invested) }}</div>
+                            <small class="text-muted">Total Invested</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Withdrawals -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>Recent Withdrawal Requests
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Amount</th>
+                                    <th>UPI ID</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transaction in current_user.transactions if transaction.transaction_type == 'withdrawal' %}
+                                <tr>
+                                    <td>₹{{ "{:,.2f}".format(transaction.amount) }}</td>
+                                    <td>{{ transaction.upi_id }}</td>
+                                    <td>
+                                        {% if transaction.status == 'completed' %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% elif transaction.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Failed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ transaction.created_at.strftime('%d %b %Y') }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">No withdrawal requests yet</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Withdrawal Guidelines -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-question-circle me-2"></i>Withdrawal Guidelines
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Processing Time:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-clock text-primary me-2"></i>24-48 hours</li>
+                                <li><i class="fas fa-calendar text-success me-2"></i>Business days only</li>
+                                <li><i class="fas fa-envelope text-info me-2"></i>Email confirmation</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Requirements:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Minimum ₹100</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Valid UPI ID</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Account verification</li>
+                                <li><i class="fas fa-check text-success me-2"></i>No pending investments</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

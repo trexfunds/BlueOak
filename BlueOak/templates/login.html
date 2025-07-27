@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Login - BlueOak Investment Firm{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+            <div class="card">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold mb-2">Welcome Back</h2>
+                        <p class="text-muted">Login to your BlueOak Investment Firm account</p>
+                    </div>
+                    
+                    <form method="POST">
+                        <div class="mb-4">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" placeholder="9876543210" required>
+                            <div class="form-text">Enter your registered phone number</div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 btn-lg">
+                            <i class="fas fa-mobile-alt me-2"></i>Send OTP
+                        </button>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <p class="mb-0">Don't have an account? <a href="{{ url_for('register') }}" class="text-primary">Register here</a></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="row mt-4 text-center">
+                <div class="col-4">
+                    <div class="bg-primary bg-gradient text-white rounded p-3">
+                        <h5 class="mb-1">10,000+</h5>
+                        <small>Active Users</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="bg-success bg-gradient text-white rounded p-3">
+                        <h5 class="mb-1">₹50M+</h5>
+                        <small>Total Invested</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="bg-warning bg-gradient text-white rounded p-3">
+                        <h5 class="mb-1">99.8%</h5>
+                        <small>Success Rate</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
